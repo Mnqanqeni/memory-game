@@ -14,18 +14,38 @@ const emojis = [
     "⚡️", "☄️", "💥", "🔥", "🌪", "🌈", "☀️", "⛈", "⛄️", "💦"
   ];
   
-  
+document.querySelector(".reset").addEventListener("click", ()=>{
+  document.location.reload()
+})
+populate()
 
+
+function populate(){
+  const gameCards=pickBoardCards(4,4);
+  for(let i=0;i<gameCards.length;i++){
+    let card = document.createElement("div");
+    card.className="item";
+    card.innerHTML=gameCards[i];
+    document.querySelector(".game").appendChild(card);
+  }
+}
 
 function pickBoardCards(n, m) {
-  emojisToTheBoard = [];
-  let temp=[...emojis]
-  for (let i = 0; i < (n * m)/2; i++) {
-    console.log(Math.random() * temp.length)
-    emojisToTheBoard.push(temp[Math.floor(Math.random() * temp.length)]);
-    temp=temp.slice(0,)
+  let  temp = shuffle(emojis).slice(0,(n*m)/2);
+  
+  return shuffle([...temp, ...temp])
+}
+
+function shuffle(array){
+  shuffledArray = [];
+  const length = array.length;
+
+  for (let i = 0; i < length; i++) {
+    let index=Math.floor(Math.random() * array.length);
+    shuffledArray.push(array[index]);
+    array=array.slice(0,index).concat(array.slice(index+1));
   }
-  return [...emojisToTheBoard,...emojisToTheBoard]
+  return shuffledArray
 }
 
 console.log(pickBoardCards(4,4))
