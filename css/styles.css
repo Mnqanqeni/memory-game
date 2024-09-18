@@ -15,12 +15,12 @@ body{
     align-items: center;
     min-height: 100vh;
     background-color: rgb(105, 108, 110);
-    border: solid red;
+    
 
 }
 
 .container{
-    border: solid green;
+    
     position: relative;
     justify-content: center;
     align-items: center;
@@ -54,6 +54,7 @@ h2{
 }
 
 .game{
+    
     width: 440px;
     height: 440px;
     display: flex;
@@ -64,7 +65,7 @@ h2{
 }
 
 .item{
-    border: solid ;
+    
     position: relative;
     width: 100px;
     height: 100px;
@@ -73,5 +74,26 @@ h2{
     align-items: center;
     font-size: 3em;
     background: white;
-    transform: 0.25s;
+    transition: 0.25s;
+}
+
+.item.cardOpen{
+    transform: rotateY(180);
+}
+
+.item::after{
+    content: "";
+    position: absolute;
+    inline-size: none;
+    inset: 0;
+    background: rgba(228, 228, 228, 0.986); 
+    /* opacity: 0.5; */
+    transition: 0.25s;
+    transform: rotateY(0deg);
+    backface-visibility: hidden;
+}
+
+.cardOpen::after,
+.cardMatch::after{
+    transform: rotateY(180deg);
 }
