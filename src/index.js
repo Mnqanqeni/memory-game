@@ -1,50 +1,55 @@
-const confetti = require("canvas-confetti").default;
-window.confetti = confetti;
-const {emojis} =  require("./emojis");
+const { emojis } = require("./emojis");
 
 populate();
 restart();
 
 function populate() {
   const gameCards = pickBoardCards(4, 4);
-  gameCards.forEach((emoji, i) => {
-    const card = document.createElement("div");
-    card.className = "item";
-    card.innerHTML = emoji;
-    document.querySelector(".game").appendChild(card);
+  const resetBtn = document.querySelector("#reset_btn");
 
-    card.onclick = function () {
-      card.classList.add("cardOpen");
+  gameCards.forEach((emoji) => createCard(emoji, gameCards.length, resetBtn));
+}
 
-      const openCards = document.querySelectorAll(".cardOpen");
-      if (openCards.length > 1) {
-        if (openCards[0].innerHTML === openCards[1].innerHTML) {
-          openCards[0].classList.add("cardMatch");
-          openCards[1].classList.add("cardMatch");
+function createCard(emoji, totalCards, resetBtn) {
+  const card = document.createElement("div");
+  card.className = "item";
+  card.innerHTML = emoji;
+  document.querySelector(".game").appendChild(card);
 
-          if (
-            document.querySelectorAll(".cardMatch").length === gameCards.length
-          ) {
-            window.confetti({
-              particleCount: 300,
-              spread: 260,
-              origin: { y: 0.6 },
-            });
-          }
+  card.onclick = () => handleCardClick(card, totalCards, resetBtn);
+}
 
-          setTimeout(() => {
-            openCards[0].classList.remove("cardOpen");
-            openCards[1].classList.remove("cardOpen");
-          }, 600);
-        } else {
-          setTimeout(() => {
-            openCards[0].classList.remove("cardOpen");
-            openCards[1].classList.remove("cardOpen");
-          }, 600);
-        }
-      }
-    };
-  });
+function handleCardClick(card, totalCards, resetBtn) {
+  card.classList.add("cardOpen");
+  enableResetButton(resetBtn);
+
+  const openCards = document.querySelectorAll(".cardOpen");
+  if (openCards.length === 2) {
+    checkMatch(openCards, totalCards);
+  }
+}
+
+function enableResetButton(resetBtn) {
+  resetBtn.classList.remove("disabled");
+  resetBtn.disabled = false;
+}
+
+function checkMatch(openCards, totalCards) {
+  const [firstCard, secondCard] = openCards;
+  
+  if (firstCard.innerHTML === secondCard.innerHTML) {
+    firstCard.classList.add("cardMatch");
+    secondCard.classList.add("cardMatch");
+
+    if (document.querySelectorAll(".cardMatch").length === totalCards) {
+      displayWinMessage();
+    }
+  }
+  setTimeout(() => closeOpenCards(openCards), 600);
+}
+
+function closeOpenCards(openCards) {
+  openCards.forEach(card => card.classList.remove("cardOpen"));
 }
 
 function restart() {
@@ -60,12 +65,14 @@ function pickBoardCards(rows, cols) {
 }
 
 function shuffle(array) {
-  let shuffledArray = [];
-  while (array.length) {
-    let index = Math.floor(Math.random() * array.length);
-    shuffledArray.push(array.splice(index, 1)[0]);
-  }
-  return shuffledArray;
+  return array.sort(() => Math.random() - 0.5);
+}
+
+function displayWinMessage() {
+  const messageDiv = document.createElement("div");
+  messageDiv.className = "winMessage";
+  messageDiv.innerHTML = "<h1>Congratulations! You Won!</h1>";
+  document.querySelector(".container").appendChild(messageDiv);
 }
 
 module.exports = { restart, populate };

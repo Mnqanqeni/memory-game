@@ -20,7 +20,7 @@ body{
 }
 
 .container{
-    
+    display: flex;
     position: relative;
     justify-content: center;
     align-items: center;
@@ -46,11 +46,13 @@ h2{
     text-transform: uppercase;
     cursor: pointer;
     font-weight: 600;
+    
 }
 
 .reset:focus{
     color: rgb(255, 255, 255);
     background: rgb(128, 3, 245);
+
 }
 
 .game{
@@ -87,7 +89,6 @@ h2{
     inline-size: none;
     inset: 0;
     background: rgba(228, 228, 228, 0.986); 
-    /* opacity: 0.5; */
     transition: 0.25s;
     transform: rotateY(0deg);
     backface-visibility: hidden;
@@ -96,4 +97,15 @@ h2{
 .cardOpen::after,
 .cardMatch::after{
     transform: rotateY(180deg);
+}
+
+.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.winMessage{
+    color: rgb(128, 3, 245);
+    display: flex;
+    justify-content: center;
 }
