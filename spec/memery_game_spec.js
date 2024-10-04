@@ -20,6 +20,8 @@ let restart;
 
 describe("Memory Game", function () {
   beforeEach(function () {
+    jasmine.clock().install();
+
     html = fs.readFileSync(path.resolve(__dirname, "../index.html"), "utf-8");
 
     dom = new JSDOM(html, {
@@ -45,6 +47,7 @@ describe("Memory Game", function () {
     dom.window.close();
     global.window = undefined;
     global.document = undefined;
+    jasmine.clock().uninstall();
   });
 
   describe("Initial Game State", function () {
@@ -82,7 +85,7 @@ describe("Memory Game", function () {
       expect(matchedCards.length).toBe(2);
     });
 
-    it("should not allow flipping more than two cards at once", async function () {
+    it("should not allow flipping more than two cards at once", function () {
       cards[0].innerHTML = "🧳";
       cards[1].innerHTML = "✈️";
       cards[2].innerHTML = "🌍";
@@ -91,20 +94,37 @@ describe("Memory Game", function () {
       cards[1].click();
       cards[2].click();
 
-      await new Promise((resolve) => setTimeout(resolve, 700));
+      jasmine.clock().tick(700);
 
       expect(cards[0].classList.contains("cardOpen")).toBe(false);
       expect(cards[1].classList.contains("cardOpen")).toBe(false);
     });
 
-    it("should flip back non-matching cards", async function () {
+    it("should not flip back matching cards", function () {
+      cards[0].innerHTML = "🧳";
+      cards[1].innerHTML = "🧳";
+
+      cards[0].click();
+      cards[0].click();
+      cards[1].click();
+      cards[1].click();
+
+      jasmine.clock().tick(700);
+
+      expect(cards[0].classList.contains("cardOpen")).toBe(false);
+      expect(cards[1].classList.contains("cardOpen")).toBe(false);
+      expect(cards[0].classList.contains("cardMatch")).toBe(true);
+      expect(cards[1].classList.contains("cardMatch")).toBe(true);
+    });
+
+    it("should flip back non-matching cards", function () {
       cards[0].innerHTML = "🧳";
       cards[1].innerHTML = "✈️";
 
       cards[0].click();
       cards[1].click();
 
-      await new Promise((resolve) => setTimeout(resolve, 700));
+      jasmine.clock().tick(700);
 
       expect(cards[0].classList.contains("cardOpen")).toBe(false);
       expect(cards[1].classList.contains("cardOpen")).toBe(false);
@@ -119,12 +139,16 @@ describe("Memory Game", function () {
 
   describe("Reset Functionality", function () {
     it("should keep the same number of cards after restart", function () {
+      resetButton.disabled = false;
+      global.window = mockWindow;
       resetButton.click();
       const newCards = document.querySelectorAll(".item");
       expect(newCards.length).toBe(cards.length);
     });
 
     it("should have no flipped cards after restart", function () {
+      resetButton.disabled = false;
+      global.window = mockWindow;
       resetButton.click();
       cards.forEach((card) => {
         expect(card.classList.contains("cardOpen")).toBe(false);
@@ -146,13 +170,13 @@ describe("Memory Game", function () {
   });
 
   describe("Win Conditions", function () {
-    it("should display a win message when all cards are matched", async function () {
+    it("should display a win message when all cards are matched", function () {
       for (let i = 0; i < cards.length; i += 2) {
         cards[i].innerHTML = "🧳";
         cards[i + 1].innerHTML = "🧳";
         cards[i].click();
         cards[i + 1].click();
-        await new Promise((resolve) => setTimeout(resolve, 700));
+        jasmine.clock().tick(700);
       }
 
       const matchedCards = document.querySelectorAll(".cardMatch");
