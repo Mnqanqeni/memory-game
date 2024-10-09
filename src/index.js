@@ -1,7 +1,9 @@
 const { emojis } = require("./emojis");
 
-initializeGameBoard();
-restart();
+document.addEventListener("DOMContentLoaded", function () {
+  initializeGameBoard();
+  restart();
+});
 
 function initializeGameBoard() {
   const gameCards = pickBoardCards(4, 4);

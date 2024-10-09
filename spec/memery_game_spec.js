@@ -2,42 +2,41 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 const { JSDOM } = require("jsdom");
 const fs = require("fs");
 const path = require("path");
+const { setCardValues, clickCards, simulateTime } = require("./spec_helper");
+
 const mockWindow = {
   location: {
     reload: jasmine.createSpy("reload"),
-    href: ""
+    href: "",
   },
 };
 
-let html;
-let dom;
-let document;
-let window;
-let cards;
-let resetButton;
-let populate;
-let restart;
+let html,
+  dom,
+  document,
+  window,
+  cards,
+  resetButton,
+  initializeGameBoard,
+  restart;
 
 describe("Memory Game", function () {
   beforeEach(function () {
     jasmine.clock().install();
 
     html = fs.readFileSync(path.resolve(__dirname, "../index.html"), "utf-8");
-
-    dom = new JSDOM(html, {
-      runScripts: "dangerously",
-    });
+    dom = new JSDOM(html, { runScripts: "dangerously" });
     document = dom.window.document;
     window = dom.window;
     global.window = window;
     global.document = document;
 
     const gameModule = require("../src/index");
-    populate = gameModule.populate;
+    initializeGameBoard = gameModule.initializeGameBoard;
     restart = gameModule.restart;
-
+    cards = document.querySelectorAll(".item");
     restart();
-    populate();
+    initializeGameBoard();
 
     cards = document.querySelectorAll(".item");
     resetButton = document.querySelector(".reset");
@@ -63,76 +62,59 @@ describe("Memory Game", function () {
     });
 
     it("should create the correct number of game cards", function () {
-      expect(cards.length).toBe(16); 
+      cards = document.querySelectorAll(".item");
+      expect(cards.length).toBe(16);
     });
   });
 
   describe("Card Interactions", function () {
     it("should add 'cardOpen' class when a card is clicked", function () {
-      const firstCard = cards[0];
-      firstCard.click();
-      expect(firstCard.classList.contains("cardOpen")).toBe(true);
+      clickCards([0], cards);
+      expect(cards[0].classList.contains("cardOpen")).toBe(true);
     });
 
     it("should add 'cardMatch' class when two matching cards are clicked", function () {
-      cards[0].innerHTML = "🧳";
-      cards[1].innerHTML = "🧳";
-
-      cards[0].click();
-      cards[1].click();
-
-      const matchedCards = document.querySelectorAll(".cardMatch");
-      expect(matchedCards.length).toBe(2);
+      setCardValues(["🧳", "🧳"], cards);
+      clickCards([0, 1], cards);
+      expect(document.querySelectorAll(".cardMatch").length).toBe(2);
     });
 
     it("should not allow flipping more than two cards at once", function () {
-      cards[0].innerHTML = "🧳";
-      cards[1].innerHTML = "✈️";
-      cards[2].innerHTML = "🌍";
+      setCardValues(["🧳", "✈️", "🌍"], cards);
+      clickCards([0, 1, 2], cards);
+      simulateTime(700);
+      [0, 1].forEach((index) =>
+        expect(cards[index].classList.contains("cardOpen")).toBe(false)
+      );
+    });
 
-      cards[0].click();
-      cards[1].click();
-      cards[2].click();
-
-      jasmine.clock().tick(700);
-
-      expect(cards[0].classList.contains("cardOpen")).toBe(false);
-      expect(cards[1].classList.contains("cardOpen")).toBe(false);
+    it("should not break when more than two cards are clicked fast", function () {
+      setCardValues(["🧳", "✈️", "🧶", "🦺", "🐯", "🧳"], cards);
+      clickCards([0, 1, 2, 3, 5, 6], cards);
+      simulateTime(700);
+      [0, 1, 2, 3, 4, 5].forEach((index) =>
+        expect(cards[index].classList.contains("cardOpen")).toBe(false)
+      );
     });
 
     it("should not flip back matching cards", function () {
-      cards[0].innerHTML = "🧳";
-      cards[1].innerHTML = "🧳";
-
-      cards[0].click();
-      cards[0].click();
-      cards[1].click();
-      cards[1].click();
-
-      jasmine.clock().tick(700);
-
-      expect(cards[0].classList.contains("cardOpen")).toBe(false);
-      expect(cards[1].classList.contains("cardOpen")).toBe(false);
+      setCardValues(["🧳", "🧳"], cards);
+      clickCards([0, 1], cards);
+      simulateTime(700);
       expect(cards[0].classList.contains("cardMatch")).toBe(true);
       expect(cards[1].classList.contains("cardMatch")).toBe(true);
     });
 
     it("should flip back non-matching cards", function () {
-      cards[0].innerHTML = "🧳";
-      cards[1].innerHTML = "✈️";
-
-      cards[0].click();
-      cards[1].click();
-
-      jasmine.clock().tick(700);
-
+      setCardValues(["🧳", "✈️"], cards);
+      clickCards([0, 1], cards);
+      simulateTime(700);
       expect(cards[0].classList.contains("cardOpen")).toBe(false);
       expect(cards[1].classList.contains("cardOpen")).toBe(false);
     });
 
     it("should not allow the same card to be clicked twice", function () {
-      cards[0].click();
-      cards[0].click();
+      clickCards([0, 0], cards);
       expect(cards[0].classList.contains("cardOpen")).toBe(true);
     });
   });
@@ -157,7 +139,7 @@ describe("Memory Game", function () {
 
     it("should disable the reset button until a card is clicked", function () {
       expect(resetButton.disabled).toBe(true);
-      cards[0].click();
+      clickCards([0], cards);
       expect(resetButton.disabled).toBe(false);
     });
 
@@ -172,11 +154,9 @@ describe("Memory Game", function () {
   describe("Win Conditions", function () {
     it("should display a win message when all cards are matched", function () {
       for (let i = 0; i < cards.length; i += 2) {
-        cards[i].innerHTML = "🧳";
-        cards[i + 1].innerHTML = "🧳";
-        cards[i].click();
-        cards[i + 1].click();
-        jasmine.clock().tick(700);
+        setCardValues(Array(cards.length).fill("🧳"), cards);
+        clickCards([i, i + 1], cards);
+        simulateTime(700);
       }
 
       const matchedCards = document.querySelectorAll(".cardMatch");
