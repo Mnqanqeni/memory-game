@@ -2,7 +2,7 @@
   "name": "ndiyakholwa-mnqanqeni-222-memory-game-in-vanilla-js-javascript",
   "version": "1.0.0",
   "description": "Memory game web app (222) For raw project instructions see: http://syllabus.africacode.net/projects/memory-game/part-1/",
-  "main": "webpack.config.js",
+  "main": "./dist/main.js",
   "scripts": {
     "test": "jasmine",
     "build": "webpack"
