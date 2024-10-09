@@ -1,9 +1,9 @@
 const { emojis } = require("./emojis");
 
-populate();
+initializeGameBoard();
 restart();
 
-function populate() {
+function  initializeGameBoard() {
   const gameCards = pickBoardCards(4, 4);
   const resetBtn = document.querySelector("#reset_btn");
 
@@ -75,4 +75,4 @@ function displayWinMessage() {
   document.querySelector(".container").appendChild(messageDiv);
 }
 
-module.exports = { restart, populate };
+module.exports = { restart,  initializeGameBoard };

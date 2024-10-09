@@ -109,3 +109,17 @@ h2{
     display: flex;
     justify-content: center;
 }
+
+@media (max-width:561px) {
+    .game{
+        width: 270px;
+        height: 270px;
+        gap: 14px;
+    }
+
+    .item{   
+        width: 55px;
+        height: 55px;      
+    }
+    
+}
