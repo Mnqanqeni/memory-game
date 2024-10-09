@@ -24,7 +24,7 @@ function handleCardClick(card, totalCards, resetBtn) {
   enableResetButton(resetBtn);
 
   const openCards = document.querySelectorAll(".cardOpen");
-  if (openCards.length === 2) {
+  if (openCards.length >= 2) {
     checkMatch(openCards, totalCards);
   }
 }
