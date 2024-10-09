@@ -3,7 +3,7 @@ const { emojis } = require("./emojis");
 initializeGameBoard();
 restart();
 
-function  initializeGameBoard() {
+function initializeGameBoard() {
   const gameCards = pickBoardCards(4, 4);
   const resetBtn = document.querySelector("#reset_btn");
 
@@ -36,7 +36,7 @@ function enableResetButton(resetBtn) {
 
 function checkMatch(openCards, totalCards) {
   const [firstCard, secondCard] = openCards;
-  
+
   if (firstCard.innerHTML === secondCard.innerHTML) {
     firstCard.classList.add("cardMatch");
     secondCard.classList.add("cardMatch");
@@ -49,7 +49,7 @@ function checkMatch(openCards, totalCards) {
 }
 
 function closeOpenCards(openCards) {
-  openCards.forEach(card => card.classList.remove("cardOpen"));
+  openCards.forEach((card) => card.classList.remove("cardOpen"));
 }
 
 function restart() {
@@ -75,4 +75,4 @@ function displayWinMessage() {
   document.querySelector(".container").appendChild(messageDiv);
 }
 
-module.exports = { restart,  initializeGameBoard };
+module.exports = { restart, initializeGameBoard };
