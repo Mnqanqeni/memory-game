@@ -37,6 +37,7 @@ describe("Memory Game", function () {
     initializeGameBoard();
 
     domElements.cards = document.querySelectorAll(".item");
+    
   });
 
   afterEach(function () {
@@ -64,6 +65,12 @@ describe("Memory Game", function () {
   });
 
   describe("Card Interactions", function () {
+    it("should remove 'cardOpen' from flipped cards after time out if no match", function () {
+      setCardValues(["🧳", "🌍"], domElements.cards);
+      clickCards([0, 1], domElements.cards);
+      jasmine.clock().tick(600);
+      expect(domElements.cards[0].classList.contains("cardOpen")).toBe(false);
+    });
     it("should add 'cardOpen' class when a card is clicked", function () {
       clickCards([0], domElements.cards);
       expect(domElements.cards[0].classList.contains("cardOpen")).toBe(true);
@@ -78,11 +85,8 @@ describe("Memory Game", function () {
     it("should not allow flipping more than two cards at once", function () {
       setCardValues(["🧳", "✈️", "🌍"], domElements.cards);
       clickCards([0, 1, 2], domElements.cards);
-      simulateTime(700);
-      [0, 1].forEach((index) =>
-        expect(domElements.cards[index].classList.contains("cardOpen")).toBe(
-          false
-        )
+      expect(domElements.cards[2].classList.contains("cardOpen")).toBe(
+        false
       );
     });
 
@@ -140,6 +144,7 @@ describe("Memory Game", function () {
     it("should disable the reset button until a card is clicked", function () {
       expect(domElements.resetButton.disabled).toBe(true);
       clickCards([0], domElements.cards);
+      restartButton = document.querySelector("#reset_btn");
       expect(domElements.resetButton.disabled).toBe(false);
     });
 

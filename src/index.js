@@ -1,4 +1,5 @@
 const { emojis } = require("./emojis");
+const {domElements}=require("./dom_elements");
 
 document.addEventListener("DOMContentLoaded", function () {
   initializeGameBoard();
@@ -7,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function initializeGameBoard() {
   const gameCards = pickBoardCards(4, 4);
-  const resetBtn = document.querySelector("#reset_btn");
+  const resetBtn = domElements.resetBtn;
 
   gameCards.forEach((emoji) => createCard(emoji, gameCards.length, resetBtn));
 }
@@ -22,17 +23,21 @@ function createCard(emoji, totalCards, resetBtn) {
 }
 
 function handleCardClick(card, totalCards, resetBtn) {
-  card.classList.add("cardOpen");
+  let openCards = document.querySelectorAll(".cardOpen");
+  if (openCards.length === 2) {
+      return;
+  }
+  toggleClass(card,"cardOpen", "add");
   enableResetButton(resetBtn);
+  openCards = document.querySelectorAll(".cardOpen");
 
-  const openCards = document.querySelectorAll(".cardOpen");
-  if (openCards.length >= 2) {
-    checkMatch(openCards, totalCards);
+  if (openCards.length === 2) {
+      checkMatch(openCards, totalCards);
   }
 }
 
 function enableResetButton(resetBtn) {
-  resetBtn.classList.remove("disabled");
+  toggleClass(resetBtn,"disabled", "remove");
   resetBtn.disabled = false;
 }
 
@@ -40,9 +45,9 @@ function checkMatch(openCards, totalCards) {
   const [firstCard, secondCard] = openCards;
 
   if (firstCard.innerHTML === secondCard.innerHTML) {
-    firstCard.classList.add("cardMatch");
-    secondCard.classList.add("cardMatch");
-
+    toggleClass(firstCard,"cardMatch", "add");
+    toggleClass(secondCard,"cardMatch", "add");
+    
     if (document.querySelectorAll(".cardMatch").length === totalCards) {
       displayWinMessage();
     }
@@ -51,7 +56,7 @@ function checkMatch(openCards, totalCards) {
 }
 
 function closeOpenCards(openCards) {
-  openCards.forEach((card) => card.classList.remove("cardOpen"));
+  openCards.forEach((card) => toggleClass(card,"cardOpen", "remove"));
 }
 
 function restart() {
@@ -68,6 +73,10 @@ function pickBoardCards(rows, cols) {
 
 function shuffle(array) {
   return array.sort(() => Math.random() - 0.5);
+}
+
+function toggleClass(element, className, add) {
+  add==="add"? element.classList.add(className):element.classList.remove(className);
 }
 
 function displayWinMessage() {
