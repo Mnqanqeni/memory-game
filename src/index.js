@@ -1,5 +1,5 @@
 const { emojis } = require("./emojis");
-const {domElements}=require("./dom_elements");
+const { domElements } = require("./dom_elements");
 
 document.addEventListener("DOMContentLoaded", function () {
   initializeGameBoard();
@@ -8,46 +8,45 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function initializeGameBoard() {
   const gameCards = pickBoardCards(4, 4);
-  const resetBtn = domElements.resetBtn;
 
-  gameCards.forEach((emoji) => createCard(emoji, gameCards.length, resetBtn));
+  gameCards.forEach((emoji) => createCard(emoji, gameCards.length));
 }
 
-function createCard(emoji, totalCards, resetBtn) {
+function createCard(emoji, totalCards) {
   const card = document.createElement("div");
   card.className = "item";
   card.innerHTML = emoji;
   document.querySelector(".game").appendChild(card);
 
-  card.onclick = () => handleCardClick(card, totalCards, resetBtn);
+  card.onclick = () => handleCardClick(card, totalCards);
 }
 
-function handleCardClick(card, totalCards, resetBtn) {
+function handleCardClick(card, totalCards) {
   let openCards = document.querySelectorAll(".cardOpen");
   if (openCards.length === 2) {
-      return;
+    return;
   }
-  toggleClass(card,"cardOpen", "add");
-  enableResetButton(resetBtn);
+  toggleClass(card, "cardOpen", "add");
+  enableResetButton();
   openCards = document.querySelectorAll(".cardOpen");
 
   if (openCards.length === 2) {
-      checkMatch(openCards, totalCards);
+    checkMatch(openCards, totalCards);
   }
 }
 
-function enableResetButton(resetBtn) {
-  toggleClass(resetBtn,"disabled", "remove");
-  resetBtn.disabled = false;
+function enableResetButton() {
+  toggleClass(domElements.resetBtn(), "disabled", "remove");
+  domElements.resetBtn().disabled = false;
 }
 
 function checkMatch(openCards, totalCards) {
   const [firstCard, secondCard] = openCards;
 
   if (firstCard.innerHTML === secondCard.innerHTML) {
-    toggleClass(firstCard,"cardMatch", "add");
-    toggleClass(secondCard,"cardMatch", "add");
-    
+    toggleClass(firstCard, "cardMatch", "add");
+    toggleClass(secondCard, "cardMatch", "add");
+
     if (document.querySelectorAll(".cardMatch").length === totalCards) {
       displayWinMessage();
     }
@@ -56,13 +55,22 @@ function checkMatch(openCards, totalCards) {
 }
 
 function closeOpenCards(openCards) {
-  openCards.forEach((card) => toggleClass(card,"cardOpen", "remove"));
+  openCards.forEach((card) => toggleClass(card, "cardOpen", "remove"));
 }
 
 function restart() {
-  document.querySelector(".reset").addEventListener("click", () => {
-    window.location.reload();
+  domElements.resetBtn().addEventListener("click", () => {
+    document.querySelector(".game").innerHTML = "";
+    initializeGameBoard();
+    toggleClass(domElements.resetBtn(), "disabled", "add");
+    domElements.resetBtn().disabled = true;
+    removeWinMessage();
   });
+}
+
+function removeWinMessage() {
+  const message = document.querySelector(".winMessage");
+  if (message) message.remove();
 }
 
 function pickBoardCards(rows, cols) {
@@ -76,7 +84,9 @@ function shuffle(array) {
 }
 
 function toggleClass(element, className, add) {
-  add==="add"? element.classList.add(className):element.classList.remove(className);
+  add === "add"
+    ? element.classList.add(className)
+    : element.classList.remove(className);
 }
 
 function displayWinMessage() {

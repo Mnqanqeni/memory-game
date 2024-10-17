@@ -1,5 +1,7 @@
-const domElements={
-    resetBtn:document.querySelector("#reset_btn")
-}
+const domElements = {
+  cards: () => document.querySelectorAll(".item"),
+  resetBtn: () => document.querySelector("#reset_btn"),
+  winMessage: () => document.querySelector(".winMessage"),
+};
 
-module.exports = {domElements};
+module.exports = { domElements };
