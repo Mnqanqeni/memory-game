@@ -16,19 +16,19 @@ function createCard(emoji, totalCards) {
   const card = document.createElement("div");
   card.className = "item";
   card.innerHTML = emoji;
-  document.querySelector(".game").appendChild(card);
+  domElements.gameContainer().appendChild(card);
 
   card.onclick = () => handleCardClick(card, totalCards);
 }
 
 function handleCardClick(card, totalCards) {
-  let openCards = document.querySelectorAll(".cardOpen");
+  let openCards = domElements.openCards();
   if (openCards.length === 2) {
     return;
   }
   toggleClass(card, "cardOpen", "add");
   enableResetButton();
-  openCards = document.querySelectorAll(".cardOpen");
+  openCards = domElements.openCards();
 
   if (openCards.length === 2) {
     checkMatch(openCards, totalCards);
@@ -46,8 +46,9 @@ function checkMatch(openCards, totalCards) {
   if (firstCard.innerHTML === secondCard.innerHTML) {
     toggleClass(firstCard, "cardMatch", "add");
     toggleClass(secondCard, "cardMatch", "add");
+    closeOpenCards(openCards);
 
-    if (document.querySelectorAll(".cardMatch").length === totalCards) {
+    if (domElements.matchedCards().length === totalCards) {
       displayWinMessage();
     }
   }
@@ -60,7 +61,7 @@ function closeOpenCards(openCards) {
 
 function restart() {
   domElements.resetBtn().addEventListener("click", () => {
-    document.querySelector(".game").innerHTML = "";
+    domElements.gameContainer().innerHTML = "";
     initializeGameBoard();
     toggleClass(domElements.resetBtn(), "disabled", "add");
     domElements.resetBtn().disabled = true;
@@ -69,7 +70,7 @@ function restart() {
 }
 
 function removeWinMessage() {
-  const message = document.querySelector(".winMessage");
+  const message = domElements.message();
   if (message) message.remove();
 }
 
@@ -93,7 +94,7 @@ function displayWinMessage() {
   const messageDiv = document.createElement("div");
   messageDiv.className = "winMessage";
   messageDiv.innerHTML = "<h1>Congratulations! You Won!</h1>";
-  document.querySelector(".container").appendChild(messageDiv);
+  domElements.container().appendChild(messageDiv);
 }
 
 module.exports = { restart, initializeGameBoard };
