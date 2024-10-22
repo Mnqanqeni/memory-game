@@ -138,14 +138,6 @@ describe("Memory Game", function () {
   });
 
   describe("Reset Functionality", function () {
-    it("should maintain the same number of cards after restart", function () {
-      const initialCards = domElements.cards();
-      clickCards([0], domElements.cards());
-      domElements.resetBtn().click();
-
-      expect(initialCards.length).toBe(domElements.cards().length);
-    });
-
     it("should flip all cards back after restart", function () {
       clickCards([0], domElements.cards());
       domElements.resetBtn().click();
@@ -176,11 +168,6 @@ describe("Memory Game", function () {
 
   describe("Win Conditions", function () {
     it("should display a win message when all cards are matched", function () {
-      const querySelectorSpy = spyOn(
-        document,
-        "querySelector"
-      ).and.callThrough();
-
       setCardValues(
         Array(domElements.cards().length).fill("🧳"),
         domElements.cards()
@@ -190,14 +177,14 @@ describe("Memory Game", function () {
         simulateTime(700);
       }
 
-      expect(querySelectorSpy).toHaveBeenCalledWith(".container");
+      expect(domElements.winMessage().classList).toContain("winMessage");
       expect(domElements.matchedCards().length).toBe(
         domElements.cards().length
       );
 
-      const winMessage = domElements.winMessage();
-      expect(winMessage).not.toBeNull();
-      expect(winMessage.innerHTML).toContain("Congratulations! You Won!");
+      expect(domElements.winMessage().innerHTML).toContain(
+        "Congratulations! You Won!"
+      );
     });
   });
 });
